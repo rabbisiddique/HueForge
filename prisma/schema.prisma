@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkUserId String @unique
+  username String
+  email     String   @unique
+  firstname      String?
+  lastname      String?
+  createdAt DateTime @default(now())
+  palettes  Palette[]
+  typography  Typography[]
+  component  Component[]
+}
+
+model Palette {
+  id        String   @id @default(cuid())
+  name      String
+  colors    String    // store array of colors directly
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+model Typography {
+  id          String    @id @default(cuid())
+  fontFamily  String
+  name        String
+  levels      String
+  prompt      String?
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime  @default(now())
+}
+
+
+model Component {
+  id            String    @id @default(cuid())
+  componentName String
+  category      String
+  description   String
+  techStack     String[]
+  codeFiles     Json      // [{ filename, language, content }]
+  previewCode   String    // JSX / HTML snippet for live preview
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String
+  createdAt     DateTime  @default(now())
+}
