@@ -206,17 +206,19 @@ const LandingPage = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setPage("signup")}
               className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white rounded-2xl font-semibold text-lg shadow-2xl overflow-hidden"
             >
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity"
                 whileHover={{ scale: 1.5 }}
               />
-              <span className="relative flex items-center gap-2">
+              <Link
+                href="/sign-in"
+                className="relative flex items-center gap-2"
+              >
                 Start Creating Free
                 <ArrowRight className="w-5 h-5" />
-              </span>
+              </Link>
               <motion.div
                 className="absolute inset-0 rounded-2xl"
                 animate={{
