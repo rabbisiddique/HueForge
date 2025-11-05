@@ -28,6 +28,7 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -348,11 +349,20 @@ export default function ComponentsSection() {
           <div className="relative backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 rounded-3xl p-8 shadow-2xl border border-white/40 dark:border-white/10">
             <div className="flex items-center gap-4 mb-6">
               <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className=""
               >
-                <Sparkles className="w-7 h-7 text-white" />
+                <Image
+                  src="/logo.jpg"
+                  alt="HueForge Logo"
+                  width={80}
+                  height={80}
+                  className="object-contain rounded-lg"
+                  priority
+                />
               </motion.div>
               <div>
                 <div>
