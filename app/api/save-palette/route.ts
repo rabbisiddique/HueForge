@@ -70,7 +70,8 @@ export const POST = async (req: Request) => {
       data: {
         userId: prismaUser?.id!, // Prisma user ID
         name,
-        colors: JSON.stringify(colorPalette), // store the array as JSON string
+        colors: JSON.stringify(colorPalette),
+        isSaved: true, // store the array as JSON string
       },
     });
 

@@ -6,11 +6,14 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import type React from "react";
 import { Toaster } from "sonner";
-import "./globals.css";
+import "../styles/globals.css";
 export const metadata: Metadata = {
   title: "HueForge - AI Design System Generator",
   description: "Generate beautiful design systems with AI",
   generator: "v0.app",
+  icons: {
+    icon: "/logo.jpg",
+  },
 };
 
 export default function RootLayout({

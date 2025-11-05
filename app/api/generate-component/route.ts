@@ -14,13 +14,21 @@ export const POST = async (req: Request) => {
     }
 
     if (useDesignSystem) {
-      if (!palette || !typography || Object.keys(palette).length === 0) {
+      // check if user has design system data
+      const hasPalette = palette && Object.keys(palette).length > 0;
+      const hasTypography = typography && Object.keys(typography).length > 0;
+
+      if (!hasPalette || !hasTypography) {
         return NextResponse.json(
-          { error: "Missing design system data (palette or typography)" },
+          {
+            error:
+              "To enable Design System, please generate both a color palette and typography first.",
+          },
           { status: 400 }
         );
       }
     }
+
     let techStack =
       "Next.js (App Router), TypeScript, Tailwind, Framer Motion, Lucide React, Shadcn UI";
     if (/HTML/i.test(prompt) && /CSS/i.test(prompt)) {

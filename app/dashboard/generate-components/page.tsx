@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
   Box,
+  CircleCheck,
   Code2,
   CreditCard,
   Grid3x3,
@@ -24,9 +25,11 @@ import {
   Sparkles,
   Star,
   User,
+  XCircle,
   Zap,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface ComponentTemplate {
   id: string;
@@ -37,6 +40,7 @@ interface ComponentTemplate {
   gradient: string;
   color: string;
   prompt: string;
+  techStack: string[];
 }
 
 export default function ComponentsSection() {
@@ -66,8 +70,15 @@ export default function ComponentsSection() {
 
         setPalette(await paletteRes.json());
         setTypography(await typoRes.json());
-      } catch (err) {
-        console.error("Error loading design system:", err);
+      } catch (error: any) {
+        console.error("Error loading design system:", error);
+        toast(
+          error?.response?.data?.error ||
+            "Something went wrong while toggling the design system.",
+          {
+            icon: <XCircle className="w-4 h-4 text-red-500" />,
+          }
+        );
       } finally {
         setLoadingDesignSystem(false);
       }
@@ -88,6 +99,7 @@ export default function ComponentsSection() {
       gradient: "from-purple-500 to-pink-500",
       color: "text-purple-600 dark:text-purple-400",
       prompt: "Generate a modern pricing card with glassmorphism",
+      techStack: [],
     },
     {
       id: "hero-section",
@@ -98,6 +110,7 @@ export default function ComponentsSection() {
       gradient: "from-blue-500 to-cyan-500",
       color: "text-blue-600 dark:text-blue-400",
       prompt: "Design a hero section with heading and CTA",
+      techStack: [],
     },
     {
       id: "testimonial-card",
@@ -108,6 +121,7 @@ export default function ComponentsSection() {
       gradient: "from-orange-500 to-red-500",
       color: "text-orange-600 dark:text-orange-400",
       prompt: "Build a testimonial card with avatar",
+      techStack: [],
     },
     {
       id: "login-form",
@@ -118,6 +132,7 @@ export default function ComponentsSection() {
       gradient: "from-green-500 to-emerald-500",
       color: "text-green-600 dark:text-green-400",
       prompt: "Design a minimalist login form",
+      techStack: [],
     },
     {
       id: "dashboard-card",
@@ -128,6 +143,7 @@ export default function ComponentsSection() {
       gradient: "from-indigo-500 to-blue-500",
       color: "text-indigo-600 dark:text-indigo-400",
       prompt: "Create a dashboard metric card",
+      techStack: [],
     },
     {
       id: "feature-grid",
@@ -138,6 +154,7 @@ export default function ComponentsSection() {
       gradient: "from-pink-500 to-rose-500",
       color: "text-pink-600 dark:text-pink-400",
       prompt: "Build a responsive feature grid",
+      techStack: [],
     },
     {
       id: "button-variants",
@@ -148,6 +165,7 @@ export default function ComponentsSection() {
       gradient: "from-violet-500 to-purple-500",
       color: "text-violet-600 dark:text-violet-400",
       prompt: "Generate button variants",
+      techStack: [],
     },
     {
       id: "modal-dialog",
@@ -158,6 +176,7 @@ export default function ComponentsSection() {
       gradient: "from-cyan-500 to-blue-500",
       color: "text-cyan-600 dark:text-cyan-400",
       prompt: "Create a glassmorphic modal",
+      techStack: [],
     },
   ];
 
@@ -204,8 +223,20 @@ export default function ComponentsSection() {
 
       setGeneratedComponents((prev) => [...generated, ...prev]);
       setPrompt("");
-    } catch (error) {
+      if (data) {
+        toast(data?.message || "Component generated successfully!", {
+          icon: <CircleCheck className="w-4 h-4 text-green-500" />,
+        });
+      }
+    } catch (error: any) {
       console.error("Error generating component:", error);
+      toast(
+        error?.response?.data?.error ||
+          "Something went wrong while generating the component.",
+        {
+          icon: <XCircle className="w-4 h-4 text-red-500" />,
+        }
+      );
     } finally {
       setIsGenerating(false);
     }

@@ -28,6 +28,7 @@ export default function PaletteSection() {
   const [colorPalette, setColorPalette] = useState<PaletteData[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaveing, setIsSaveing] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   const copyToClipboard = (hex: string, index: number) => {
     navigator.clipboard.writeText(hex);
@@ -61,6 +62,7 @@ export default function PaletteSection() {
       }
 
       setPrompt("");
+      setIsSaved(false);
     } catch (error: any) {
       console.log(error);
       toast(
@@ -76,13 +78,17 @@ export default function PaletteSection() {
   };
 
   const savedPalette = async () => {
+    if (isSaved || isSaveing) return;
     setIsSaveing(true);
+    setIsSaved(false);
     if (colorPalette.length === 0) return;
 
     // Take the first color name as palette name (you can change this logic later)
     const name = colorPalette[0].name;
 
     try {
+      setIsSaveing(true);
+
       const { data } = await axios.post("/api/save-palette", {
         colorPalette,
         name,
@@ -91,6 +97,7 @@ export default function PaletteSection() {
       toast(data?.message || "Palette saved successfully!", {
         icon: <CheckCircle className="w-4 h-4 text-green-600" />,
       });
+      setIsSaved(true);
     } catch (error: any) {
       console.error("Error saving palette:", error);
       toast(
@@ -121,7 +128,7 @@ export default function PaletteSection() {
             <HueHeader />
           </div>
 
-          {colorPalette.length >= 1 && (
+          {!isGenerating && colorPalette.length >= 1 && (
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -129,11 +136,15 @@ export default function PaletteSection() {
             >
               <Button
                 onClick={savedPalette}
-                disabled={isSaveing}
+                disabled={isSaveing || isSaved}
                 className="gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
               >
                 <SaveAll className="w-4 h-4" />
-                {isSaveing ? "Saving..." : "Save Palette"}
+                {isSaveing
+                  ? "Saving..."
+                  : isSaved
+                  ? "Saved Palette"
+                  : "Save Palette"}{" "}
               </Button>
             </motion.div>
           )}
@@ -176,135 +187,164 @@ export default function PaletteSection() {
               placeholder='e.g., "Vibrant sunset", "Ocean breeze", "Professional dark mode"'
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && generatePalette()}
               className="pl-12 pr-4 h-12 rounded-xl border-2 border-transparent bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm focus:bg-white dark:focus:bg-slate-800 focus:border-purple-500 transition-all"
             />
           </div>
-          <Button
-            onClick={generatePalette}
-            disabled={isGenerating}
-            className="gap-2 h-12 px-6 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 hover:from-purple-700 hover:via-pink-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 font-semibold"
-          >
-            {isGenerating ? (
-              <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              onClick={generatePalette}
+              disabled={isGenerating || !prompt.trim()}
+              className="gap-2 h-12 px-6 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 hover:from-purple-700 hover:via-pink-700 hover:to-orange-700 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 font-semibold"
+            >
+              {isGenerating ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  >
+                    <Sparkles className="w-5 h-5" />
+                  </motion.div>
+                  Generating...
+                </>
+              ) : (
+                <>
                   <Sparkles className="w-5 h-5" />
-                </motion.div>
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                Generate New
-              </>
-            )}
-          </Button>
+                  Generate New
+                </>
+              )}
+            </Button>
+          </motion.div>
         </div>
       </motion.div>
 
       {/* Color Cards Grid */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={colorPalette[0]?.hex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {colorPalette.map((color, index) => (
+        {isGenerating ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="glassmorphism rounded-2xl p-8 shadow-lg border border-white/20 dark:border-white/10 flex flex-col items-center justify-center space-y-4"
+          >
             <motion.div
-              key={`${color.name}-${color.hex}`}
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              animate={{ rotate: 360 }}
               transition={{
-                delay: index * 0.08,
-                duration: 0.4,
-                ease: "easeOut",
+                duration: 2,
+                repeat: Infinity,
+                ease: "linear",
               }}
-              className="group"
-            >
-              <button
-                onClick={() => copyToClipboard(color.hex, index)}
-                className="w-full glassmorphism rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all border border-white/20 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+              className="w-12 h-12 rounded-full border-4 border-purple-600 border-t-transparent"
+            />
+            <p className="text-muted-foreground animate-pulse">
+              Creating your color palette...
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key={colorPalette[0]?.hex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {colorPalette.map((color, index) => (
+              <motion.div
+                key={`${color.name}-${color.hex}`}
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                  delay: index * 0.08,
+                  duration: 0.4,
+                  ease: "easeOut",
+                }}
+                className="group"
               >
-                {/* Color Preview */}
-                <div className="relative overflow-hidden rounded-xl mb-4">
-                  <motion.div
-                    className="w-full h-40 rounded-xl shadow-md"
-                    style={{
-                      backgroundColor: color.hex,
-                      boxShadow: `0 8px 32px ${color.hex}60`,
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {/* Shine effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <button
+                  onClick={() => copyToClipboard(color.hex, index)}
+                  className="w-full glassmorphism rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all border border-white/20 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                >
+                  {/* Color Preview */}
+                  <div className="relative overflow-hidden rounded-xl mb-4">
+                    <motion.div
+                      className="w-full h-40 rounded-xl shadow-md"
+                      style={{
+                        backgroundColor: color.hex,
+                        boxShadow: `0 8px 32px ${color.hex}60`,
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {/* Shine effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                    {/* Copy indicator */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: copiedIndex === index ? 1 : 0 }}
-                        className="bg-white/95 dark:bg-slate-900/95 rounded-full p-3 shadow-lg"
-                      >
-                        <Check className="w-6 h-6 text-green-600" />
-                      </motion.div>
-                    </div>
-
-                    {/* Hover copy icon */}
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="bg-black/20 backdrop-blur-sm rounded-lg p-2">
-                        <Copy className="w-4 h-4 text-white" />
+                      {/* Copy indicator */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: copiedIndex === index ? 1 : 0 }}
+                          className="bg-white/95 dark:bg-slate-900/95 rounded-full p-3 shadow-lg"
+                        >
+                          <Check className="w-6 h-6 text-green-600" />
+                        </motion.div>
                       </div>
+
+                      {/* Hover copy icon */}
+                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="bg-black/20 backdrop-blur-sm rounded-lg p-2">
+                          <Copy className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  {/* Color Info */}
+                  <div className="space-y-3 text-left">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-bold text-foreground">
+                        {color.name}
+                      </h3>
+                      {copiedIndex === index && (
+                        <motion.span
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="text-xs font-medium text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full"
+                        >
+                          Copied!
+                        </motion.span>
+                      )}
                     </div>
-                  </motion.div>
-                </div>
 
-                {/* Color Info */}
-                <div className="space-y-3 text-left">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-foreground">
-                      {color.name}
-                    </h3>
-                    {copiedIndex === index && (
-                      <motion.span
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="text-xs font-medium text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full"
-                      >
-                        Copied!
-                      </motion.span>
-                    )}
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-8 h-8 rounded-lg border-2 border-white dark:border-slate-700 shadow-sm"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span className="text-sm font-mono font-semibold text-foreground">
+                        {color.hex}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-8 h-8 rounded-lg border-2 border-white dark:border-slate-700 shadow-sm"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                    <span className="text-sm font-mono font-semibold text-foreground">
-                      {color.hex}
-                    </span>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-muted-foreground font-mono">
+                        RGB: {color.rgb}
+                      </span>
+                    </div>
                   </div>
-
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="text-muted-foreground font-mono">
-                      RGB: {color.rgb}
-                    </span>
-                  </div>
-                </div>
-              </button>
-            </motion.div>
-          ))}
-        </motion.div>
+                </button>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Gradient Preview Section */}
-      {colorPalette.length >= 2 && (
+      {!isGenerating && colorPalette.length >= 2 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -422,7 +462,7 @@ export default function PaletteSection() {
       )}
 
       {/* Empty State */}
-      {colorPalette.length === 0 && (
+      {!isGenerating && colorPalette.length === 0 && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -440,11 +480,7 @@ export default function PaletteSection() {
             beautiful
           </p>
 
-          <Button
-            onClick={generatePalette}
-            disabled={isGenerating}
-            className="gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg"
-          >
+          <Button className="gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg">
             <Sparkles className="w-5 h-5" />
             Generate Your First Palette
           </Button>

@@ -163,21 +163,22 @@ text-[${sample.size}] font-${sample.weight} font-${sample.fontFamily}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", delay: 0.2 }}
           >
-            {typographySamples.map((typo, inx) => (
-              <Button
-                key={inx}
-                onClick={() => savedTypography(typo)}
-                disabled={isSaveing || isSaved}
-                className="gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
-              >
-                <SaveAll className="w-4 h-4" />
-                {isSaveing
-                  ? "Saving..."
-                  : isSaved
-                  ? "Saved"
-                  : "Save Typography"}
-              </Button>
-            ))}
+            {!isGenerating &&
+              typographySamples.map((typo, inx) => (
+                <Button
+                  key={inx}
+                  onClick={() => savedTypography(typo)}
+                  disabled={isSaveing || isSaved}
+                  className="gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                >
+                  <SaveAll className="w-4 h-4" />
+                  {isSaveing
+                    ? "Saving..."
+                    : isSaved
+                    ? "Saved Typography"
+                    : "Save Typography"}
+                </Button>
+              ))}
           </motion.div>
         </div>
 
@@ -218,308 +219,335 @@ text-[${sample.size}] font-${sample.weight} font-${sample.fontFamily}
               placeholder='e.g., "Bold and modern for a tech startup" or leave empty for auto-generate'
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleGenerate()}
               className="pl-12 pr-4 h-12 rounded-xl border-2 border-transparent bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm focus:bg-white dark:focus:bg-slate-800 focus:border-orange-500 transition-all"
             />
           </div>
-          <Button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="gap-2 h-12 px-6 rounded-xl bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 hover:from-orange-700 hover:via-red-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 font-semibold whitespace-nowrap"
-          >
-            {isGenerating ? (
-              <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating || !prompt.trim()}
+              className="gap-2 h-12 px-6 rounded-xl bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 hover:from-orange-700 hover:via-red-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 font-semibold whitespace-nowrap"
+            >
+              {isGenerating ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  >
+                    <Sparkles className="w-5 h-5" />
+                  </motion.div>
+                  Generating...
+                </>
+              ) : (
+                <>
                   <Sparkles className="w-5 h-5" />
-                </motion.div>
-                Generating...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                Generate New
-              </>
-            )}
-          </Button>
+                  Generate New
+                </>
+              )}
+            </Button>
+          </motion.div>
         </div>
       </motion.div>
 
       {/* Typography Content */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={currentPresetIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: isGenerating ? 0 : 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-6"
-        >
-          {typographySamples.length === 0 ? (
+        {isGenerating ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="glassmorphism rounded-2xl p-8 shadow-lg border border-white/20 dark:border-white/10 flex flex-col items-center justify-center space-y-4"
+          >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="glassmorphism rounded-2xl p-12 text-center shadow-lg border border-white/20 dark:border-white/10"
-            >
-              <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-100 via-pink-100 to-orange-100 dark:from-purple-900/30 dark:via-pink-900/30 dark:to-orange-900/30 flex items-center justify-center border-2 border-dashed border-purple-300 dark:border-purple-700">
-                <Sparkles className="w-12 h-12 text-purple-600 dark:text-purple-400" />
-              </div>
-
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                No Typography Generated Yet
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                Describe your desired color <strong>Typography</strong> and let
-                AI create something beautiful
-              </p>
-
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg"
-              >
-                <Sparkles className="w-5 h-5" />
-                Generate Your First Palette
-              </Button>
-            </motion.div>
-          ) : (
-            <>
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="w-12 h-12 rounded-full border-4 border-purple-600 border-t-transparent"
+            />
+            <p className="text-muted-foreground animate-pulse">
+              Creating your typography...
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key={currentPresetIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isGenerating ? 0 : 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            {typographySamples.length === 0 ? (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="glassmorphism rounded-2xl p-6 md:p-8 shadow-lg border border-white/20 dark:border-white/10"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="glassmorphism rounded-2xl p-12 text-center shadow-lg border border-white/20 dark:border-white/10"
               >
-                {typographySamples.map((simple, index) => (
-                  <div key={index}>
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center shadow-lg">
-                        <Type className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-foreground">
-                          Font Families
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          Primary typefaces for your design system
-                        </p>
-                      </div>
-                    </div>
+                <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-100 via-pink-100 to-orange-100 dark:from-purple-900/30 dark:via-pink-900/30 dark:to-orange-900/30 flex items-center justify-center border-2 border-dashed border-purple-300 dark:border-purple-700">
+                  <Sparkles className="w-12 h-12 text-purple-600 dark:text-purple-400" />
+                </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {/* Heading Font */}
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 p-6 border border-orange-200/50 dark:border-orange-800/50 hover:border-orange-300 dark:hover:border-orange-700 transition-all"
-                      >
-                        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-400/20 to-red-400/20 rounded-full blur-2xl" />
+                <h3 className="text-xl font-bold text-foreground mb-2">
+                  No Typography Generated Yet
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  Describe your desired color <strong>Typography</strong> and
+                  let AI create something beautiful
+                </p>
 
-                        <div className="relative space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-md">
-                              Headings
-                            </span>
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">
-                                H
-                              </span>
-                            </div>
-                          </div>
-
-                          <p className="text-3xl font-bold text-foreground">
-                            {simple.fontFamily}
-                          </p>
-
-                          <div className="flex flex-wrap gap-2">
-                            {simple.name.map((tag) => (
-                              <span
-                                key={tag}
-                                className="text-xs text-muted-foreground bg-white/50 dark:bg-slate-800/50 px-2 py-1 rounded-md border border-white/20"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-
-                          <p className="text-sm text-muted-foreground pt-2">
-                            {simple.description}
-                          </p>
-                        </div>
-                      </motion.div>
-
-                      {/* Body Font */}
-                      <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 p-6 border border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700 transition-all"
-                      >
-                        <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-2xl" />
-
-                        <div className="relative space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-md">
-                              Body Text
-                            </span>
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
-                              <span className="text-white text-xs font-bold">
-                                B
-                              </span>
-                            </div>
-                          </div>
-
-                          <p className="text-3xl font-normal text-foreground">
-                            {simple.fontFamily}
-                          </p>
-
-                          <div className="flex flex-wrap gap-2">
-                            {simple.name.map((tag) => (
-                              <span
-                                key={tag}
-                                className="text-xs text-muted-foreground bg-white/50 dark:bg-slate-800/50 px-2 py-1 rounded-md border border-white/20"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-
-                          <p className="text-sm text-muted-foreground pt-2">
-                            {simple.description}
-                          </p>
-                        </div>
-                      </motion.div>
-                    </div>
-                  </div>
-                ))}
+                <Button className="gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg">
+                  <Sparkles className="w-5 h-5" />
+                  Generate Your First Palette
+                </Button>
               </motion.div>
+            ) : (
+              <>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="glassmorphism rounded-2xl p-6 md:p-8 shadow-lg border border-white/20 dark:border-white/10"
+                >
+                  {typographySamples.map((simple, index) => (
+                    <div key={index}>
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center shadow-lg">
+                          <Type className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-foreground">
+                            Font Families
+                          </h3>
+                          <p className="text-sm text-muted-foreground">
+                            Primary typefaces for your design system
+                          </p>
+                        </div>
+                      </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="glassmorphism rounded-2xl p-6 md:p-8 shadow-lg border border-white/20 dark:border-white/10"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
-                    <Sparkles className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground">
-                      Type Scale
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Harmonious hierarchy and sizing
-                    </p>
-                  </div>
-                </div>
-                <div className="mb-6 flex items-center gap-3">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    Copy Format:
-                  </span>
-                  <div className="flex items-center gap-1 bg-muted/30 rounded-lg p-1">
-                    {[
-                      { value: "css" as const, label: "CSS" },
-                      { value: "tailwind" as const, label: "Tailwind" },
-                      { value: "preview" as const, label: "Preview Text" },
-                    ].map((mode) => (
-                      <button
-                        key={mode.value}
-                        onClick={() => setCopyMode(mode.value)}
-                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                          copyMode === mode.value
-                            ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {mode.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        {/* Heading Font */}
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.2 }}
+                          className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-950/30 dark:to-red-950/30 p-6 border border-orange-200/50 dark:border-orange-800/50 hover:border-orange-300 dark:hover:border-orange-700 transition-all"
+                        >
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-orange-400/20 to-red-400/20 rounded-full blur-2xl" />
 
-                <div className="space-y-6">
-                  {typographySamples.map((levelPreset, presetIndex) => (
-                    <div key={presetIndex} className="space-y-4">
-                      {/* Optional: Font Family / Preset Header */}
-                      <h4 className="text-lg font-semibold text-foreground">
-                        {levelPreset.fontFamily}
-                      </h4>
-
-                      {/* Levels */}
-                      <div className="space-y-4">
-                        {levelPreset.levels.map((sample, sampleIndex) => {
-                          const isCopied = copiedIndex === sampleIndex;
-                          return (
-                            <motion.div
-                              key={sampleIndex}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.5 + sampleIndex * 0.05 }}
-                              whileHover={{ x: 8 }}
-                              className="group relative overflow-hidden rounded-xl bg-white/50 dark:bg-slate-800/50 p-6 border border-white/20 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-600 hover:shadow-lg transition-all"
-                            >
-                              {/* Background gradient on hover */}
-                              <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                              <div className="relative">
-                                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-sm font-bold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-lg">
-                                      {sample.level}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground font-mono bg-muted/30 px-2 py-1 rounded-md">
-                                      {sample.size}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground font-mono bg-muted/30 px-2 py-1 rounded-md">
-                                      {sample.weight}
-                                    </span>
-                                  </div>
-
-                                  <button
-                                    onClick={() =>
-                                      copyToClipboard(sample, sampleIndex)
-                                    }
-                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                                      isCopied
-                                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                                        : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                    }`}
-                                  >
-                                    {isCopied ? (
-                                      <>
-                                        <Check className="w-3 h-3" />
-                                        Copied!
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Copy className="w-3 h-3" />
-                                        Copy
-                                      </>
-                                    )}
-                                  </button>
-                                </div>
-
-                                <p
-                                  className={`${sample.size} font-[${sample.weight}] text-foreground text-pretty leading-relaxed`}
-                                  style={{ fontFamily: levelPreset.fontFamily }}
-                                >
-                                  {sample.sample}
-                                </p>
+                          <div className="relative space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider bg-orange-100 dark:bg-orange-900/30 px-2 py-1 rounded-md">
+                                Headings
+                              </span>
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-600 to-red-600 flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">
+                                  H
+                                </span>
                               </div>
-                            </motion.div>
-                          );
-                        })}
+                            </div>
+
+                            <p className="text-3xl font-bold text-foreground">
+                              {simple.fontFamily}
+                            </p>
+
+                            <div className="flex flex-wrap gap-2">
+                              {simple.name.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="text-xs text-muted-foreground bg-white/50 dark:bg-slate-800/50 px-2 py-1 rounded-md border border-white/20"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+
+                            <p className="text-sm text-muted-foreground pt-2">
+                              {simple.description}
+                            </p>
+                          </div>
+                        </motion.div>
+
+                        {/* Body Font */}
+                        <motion.div
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.3 }}
+                          className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 p-6 border border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700 transition-all"
+                        >
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-2xl" />
+
+                          <div className="relative space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-md">
+                                Body Text
+                              </span>
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                                <span className="text-white text-xs font-bold">
+                                  B
+                                </span>
+                              </div>
+                            </div>
+
+                            <p className="text-3xl font-normal text-foreground">
+                              {simple.fontFamily}
+                            </p>
+
+                            <div className="flex flex-wrap gap-2">
+                              {simple.name.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="text-xs text-muted-foreground bg-white/50 dark:bg-slate-800/50 px-2 py-1 rounded-md border border-white/20"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+
+                            <p className="text-sm text-muted-foreground pt-2">
+                              {simple.description}
+                            </p>
+                          </div>
+                        </motion.div>
                       </div>
                     </div>
                   ))}
-                </div>
-              </motion.div>
-            </>
-          )}
-        </motion.div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="glassmorphism rounded-2xl p-6 md:p-8 shadow-lg border border-white/20 dark:border-white/10"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">
+                        Type Scale
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Harmonious hierarchy and sizing
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mb-6 flex items-center gap-3">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      Copy Format:
+                    </span>
+                    <div className="flex items-center gap-1 bg-muted/30 rounded-lg p-1">
+                      {[
+                        { value: "css" as const, label: "CSS" },
+                        { value: "tailwind" as const, label: "Tailwind" },
+                        { value: "preview" as const, label: "Preview Text" },
+                      ].map((mode) => (
+                        <button
+                          key={mode.value}
+                          onClick={() => setCopyMode(mode.value)}
+                          className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                            copyMode === mode.value
+                              ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {mode.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    {typographySamples.map((levelPreset, presetIndex) => (
+                      <div key={presetIndex} className="space-y-4">
+                        {/* Optional: Font Family / Preset Header */}
+                        <h4 className="text-lg font-semibold text-foreground">
+                          {levelPreset.fontFamily}
+                        </h4>
+
+                        {/* Levels */}
+                        <div className="space-y-4">
+                          {levelPreset.levels.map((sample, sampleIndex) => {
+                            const isCopied = copiedIndex === sampleIndex;
+                            return (
+                              <motion.div
+                                key={sampleIndex}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.5 + sampleIndex * 0.05 }}
+                                whileHover={{ x: 8 }}
+                                className="group relative overflow-hidden rounded-xl bg-white/50 dark:bg-slate-800/50 p-6 border border-white/20 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-600 hover:shadow-lg transition-all"
+                              >
+                                {/* Background gradient on hover */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-purple-50/50 to-pink-50/50 dark:from-purple-950/20 dark:to-pink-950/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                <div className="relative">
+                                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-sm font-bold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-lg">
+                                        {sample.level}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground font-mono bg-muted/30 px-2 py-1 rounded-md">
+                                        {sample.size}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground font-mono bg-muted/30 px-2 py-1 rounded-md">
+                                        {sample.weight}
+                                      </span>
+                                    </div>
+
+                                    <button
+                                      onClick={() =>
+                                        copyToClipboard(sample, sampleIndex)
+                                      }
+                                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                        isCopied
+                                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                                          : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                      }`}
+                                    >
+                                      {isCopied ? (
+                                        <>
+                                          <Check className="w-3 h-3" />
+                                          Copied!
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Copy className="w-3 h-3" />
+                                          Copy
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+
+                                  <p
+                                    className={`${sample.size} font-[${sample.weight}] text-foreground text-pretty leading-relaxed`}
+                                    style={{
+                                      fontFamily: levelPreset.fontFamily,
+                                    }}
+                                  >
+                                    {sample.sample}
+                                  </p>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );

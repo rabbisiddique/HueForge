@@ -19,7 +19,8 @@ export const GET = async () => {
     }
 
     const palettes = await prisma.palette.findMany({
-      where: { userId: prismaUser.id }, // Prisma ID, not Clerk ID
+      where: { userId: prismaUser.id, isSaved: true },
+      orderBy: { createdAt: "desc" },
     });
 
     // Parse colors JSON

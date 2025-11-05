@@ -16,3 +16,27 @@ export interface GeneratedComponent {
     language: string;
   }[];
 }
+
+export interface PaletteData {
+  id: string;
+  name: string;
+  colors: { name: string; hex: string; rgb: string }[];
+  createdAt: string;
+}
+export interface TypographyData {
+  id: string;
+  fontFamily: string;
+  levels: string;
+  name: string;
+  prompt: string;
+  createdAt: string;
+  userId: string;
+}
+
+export interface TypographyLevel {
+  level: string;
+  size: string;
+  weight: number;
+  sample: string;
+  fontFamily: string;
+}

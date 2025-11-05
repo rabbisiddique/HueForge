@@ -19,7 +19,8 @@ export const GET = async (req: Request) => {
     }
 
     const componentsData = await prisma.component.findMany({
-      where: { userId: prismaUser.id },
+      where: { userId: prismaUser.id, isSaved: true },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ components: componentsData }, { status: 200 });
@@ -28,4 +29,3 @@ export const GET = async (req: Request) => {
     return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 };
-

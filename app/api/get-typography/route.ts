@@ -19,7 +19,8 @@ export const GET = async (req: Request) => {
     }
 
     const typographyData = await prisma.typography.findMany({
-      where: { userId: prismaUser.id },
+      where: { userId: prismaUser.id, isSaved: true },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(typographyData, { status: 200 });

@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useAuth, UserButton } from "@clerk/nextjs";
+import { useAuth, UserButton, useUser } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronLeft,
@@ -19,10 +19,10 @@ import {
   Menu,
   Palette,
   Save,
-  Sparkles,
   Type,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -66,7 +66,7 @@ export default function Sidebar() {
   ];
 
   const { isSignedIn, userId } = useAuth();
-
+  const { user } = useUser();
   useEffect(() => {
     if (isSignedIn && userId) {
       fetch("/api/users", { method: "POST" });
@@ -158,18 +158,15 @@ export default function Sidebar() {
                   whileHover={{ scale: 1.02 }}
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/20 dark:hover:to-pink-900/20 transition-all"
                 >
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "linear",
-                    }}
-                    className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg flex-shrink-0"
-                  >
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </motion.div>
-                  <span className="text-xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent whitespace-nowrap">
+                  <Image
+                    src="/logo.jpg"
+                    alt="HueForge Logo"
+                    width={40}
+                    height={40}
+                    className="rounded-lg object-cover"
+                    priority
+                  />
+                  <span className="text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent tracking-tight">
                     HueForge
                   </span>
                 </motion.div>
@@ -178,13 +175,14 @@ export default function Sidebar() {
 
             {isCollapsed && (
               <Link href="/">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg mx-auto"
-                >
-                  <Sparkles className="w-6 h-6 text-white" />
-                </motion.div>
+                <Image
+                  src="/logo.jpg"
+                  alt="HueForge Logo"
+                  width={40}
+                  height={40}
+                  className="rounded-lg object-cover"
+                  priority
+                />
               </Link>
             )}
 
@@ -297,30 +295,23 @@ export default function Sidebar() {
                   <ThemeToggle />
                 </motion.div>
 
-                <motion.div whileHover={{ scale: 1.02 }} className="px-2">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 sm:gap-3 px-3 py-2 rounded-xl bg-gradient-to-br from-white/80 to-white/40 dark:from-gray-800/80 dark:to-gray-800/40 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                >
                   <UserButton
                     appearance={{
                       elements: {
-                        avatarBox: "w-10 h-10 rounded-xl shadow-lg",
+                        avatarBox:
+                          "w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-lg ring-2 ring-white/50 dark:ring-gray-700/50",
                       },
                     }}
                   />
+                  <span className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 truncate max-w-[100px] sm:max-w-[150px] md:max-w-none">
+                    {user?.username}
+                  </span>
                 </motion.div>
-
-                <Link href="/">
-                  <motion.div
-                    whileHover={{ scale: 1.02, x: 4 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start gap-3 text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl"
-                    >
-                      <LogOut className="w-5 h-5" />
-                      <span className="font-semibold">Log Out</span>
-                    </Button>
-                  </motion.div>
-                </Link>
               </>
             ) : (
               <>
@@ -404,18 +395,15 @@ export default function Sidebar() {
                     whileHover={{ scale: 1.02 }}
                     className="flex items-center gap-3 mb-8 p-3 rounded-xl"
                   >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg"
-                    >
-                      <Sparkles className="w-6 h-6 text-white" />
-                    </motion.div>
-                    <span className="text-2xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <Image
+                      src="/logo.jpg"
+                      alt="HueForge Logo"
+                      width={40}
+                      height={40}
+                      className="rounded-lg object-cover"
+                      priority
+                    />
+                    <span className="text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent tracking-tight">
                       HueForge
                     </span>
                   </motion.div>
@@ -478,9 +466,23 @@ export default function Sidebar() {
                     <ThemeToggle />
                   </div>
 
-                  <div className="px-2">
-                    <UserButton />
-                  </div>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-2 sm:gap-3 px-3 py-2 rounded-xl bg-gradient-to-br from-white/80 to-white/40 dark:from-gray-800/80 dark:to-gray-800/40 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  >
+                    <UserButton
+                      appearance={{
+                        elements: {
+                          avatarBox:
+                            "w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-lg ring-2 ring-white/50 dark:ring-gray-700/50",
+                        },
+                      }}
+                    />
+                    <span className="text-sm sm:text-base font-medium text-gray-700 dark:text-gray-200 truncate max-w-[100px] sm:max-w-[150px] md:max-w-none">
+                      {user?.username}
+                    </span>
+                  </motion.div>
 
                   <Link href="/">
                     <Button

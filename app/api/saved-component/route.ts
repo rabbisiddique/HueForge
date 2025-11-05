@@ -38,6 +38,7 @@ export const POST = async (req: Request) => {
         techStack: component.techStack,
         codeFiles: cleanedCodeFiles,
         previewCode: component.previewCode.replace(/\\n/g, "\n"),
+        isSaved: true,
       },
     });
 

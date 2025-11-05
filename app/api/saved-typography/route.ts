@@ -48,6 +48,7 @@ export const POST = async (req: Request) => {
         name: JSON.stringify(name),
         levels: JSON.stringify(levels),
         prompt,
+        isSaved: true,
       },
     });
 
