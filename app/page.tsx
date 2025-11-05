@@ -203,34 +203,19 @@ const LandingPage = () => {
             variants={itemVariants}
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <motion.button
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="group relative px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white rounded-2xl font-semibold text-lg shadow-2xl overflow-hidden"
+              className="group relative inline-block"
             >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                whileHover={{ scale: 1.5 }}
-              />
               <Link
                 href="/sign-in"
-                className="relative flex items-center gap-2"
+                className="relative px-8 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 hover:text-white  rounded-2xl font-semibold text-lg shadow-2xl overflow-hidden flex items-center gap-2"
               >
                 Start Creating Free
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <motion.div
-                className="absolute inset-0 rounded-2xl"
-                animate={{
-                  boxShadow: [
-                    "0 0 20px rgba(168, 85, 247, 0.4)",
-                    "0 0 40px rgba(236, 72, 153, 0.4)",
-                    "0 0 20px rgba(168, 85, 247, 0.4)",
-                  ],
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </motion.button>
+            </motion.div>
 
             <motion.button
               whileHover={{ scale: 1.05 }}

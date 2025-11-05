@@ -9,7 +9,6 @@ import {
   CircleCheck,
   Copy,
   Download,
-  RefreshCw,
   Save,
   XCircle,
 } from "lucide-react";
@@ -139,33 +138,6 @@ const ActionButtons = ({
       </motion.div>
 
       {/* Regenerate Button */}
-      <motion.div
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
-        className="relative group"
-      >
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl opacity-0 group-hover:opacity-30 blur transition duration-300" />
-        <Button
-          onClick={() => handleGenerate(component.id)}
-          className="relative w-full h-auto py-4 px-4 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-md hover:shadow-lg overflow-hidden group border-0 transition-all"
-        >
-          <motion.div
-            className="absolute inset-0 bg-white/20"
-            initial={{ x: "-100%", skewX: -15 }}
-            whileHover={{ x: "100%" }}
-            transition={{ duration: 0.6 }}
-          />
-          <div className="relative z-10 flex flex-col items-center gap-2">
-            <motion.div
-              whileHover={{ rotate: 180 }}
-              transition={{ duration: 0.5 }}
-            >
-              <RefreshCw className="w-6 h-6" />
-            </motion.div>
-            <span className="text-xs font-bold">Regenerate</span>
-          </div>
-        </Button>
-      </motion.div>
 
       {/* Export Button */}
       <motion.div
