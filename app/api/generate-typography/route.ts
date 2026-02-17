@@ -7,7 +7,7 @@ export const POST = async (req: Request) => {
     if (!prompt) {
       return NextResponse.json(
         { error: "Prompt is missing!" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -101,7 +101,7 @@ Requirements:
 `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "openai/gpt-oss-20b:free",
       messages: [{ role: "user", content: typographyPrompt }],
       temperature: 0.8,
     });
@@ -119,13 +119,13 @@ Requirements:
 
     return NextResponse.json(
       { message: "Typography generated successfully.", typographyPresets },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error in generate typography:", error);
     return NextResponse.json(
       { error: "Something went wrong!" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

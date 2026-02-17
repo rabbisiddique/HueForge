@@ -9,7 +9,7 @@ export const POST = async (req: Request) => {
     if (!prompt) {
       return NextResponse.json(
         { error: "Prompt is required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -24,7 +24,7 @@ export const POST = async (req: Request) => {
             error:
               "To enable Design System, please generate both a color palette and typography first.",
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -100,7 +100,7 @@ Return **only a valid JSON object**, no markdown, no explanations, exactly as fo
 `;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Fixed: Use a valid OpenAI model; adjust as needed
+      model: "openai/gpt-oss-20b:free",
       messages: [
         {
           role: "system",
@@ -132,19 +132,19 @@ Return **only a valid JSON object**, no markdown, no explanations, exactly as fo
       console.error("❌ Failed to parse component JSON:", err, jsonStr);
       return NextResponse.json(
         { error: "Invalid AI response format" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     return NextResponse.json(
       { message: "Component generated successfully.", component },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("🔥 Internal error generating component:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
